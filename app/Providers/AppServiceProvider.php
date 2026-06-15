@@ -13,7 +13,9 @@ use App\Listeners\HandleSiteCreatedStats;
 use App\Listeners\HandleSiteDeletedStats;
 use App\Listeners\SocketEventListener;
 use App\Models\PersonalAccessToken;
+use Illuminate\Console\Events\ScheduledTaskFinished;
 use Illuminate\Http\Resources\Json\ResourceCollection;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Facades\URL;
 use Illuminate\Support\ServiceProvider;
@@ -45,5 +47,9 @@ class AppServiceProvider extends ServiceProvider
         Event::listen(SocketEvent::class, SocketEventListener::class);
         Event::listen(SiteCreatedEvent::class, HandleSiteCreatedStats::class);
         Event::listen(SiteDeletedEvent::class, HandleSiteDeletedStats::class);
+
+        Event::listen(ScheduledTaskFinished::class, function (): void {
+            Cache::put('schedule-last-run', now()->toIso8601String(), 120);
+        });
     }
 }
