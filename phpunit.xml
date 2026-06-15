@@ -8,7 +8,12 @@
       <directory suffix="Test.php">./tests/Unit</directory>
     </testsuite>
   </testsuites>
-  <coverage/>
+  <coverage>
+    <report>
+      <text outputFile="storage/logs/coverage.txt"/>
+      <clover outputFile="storage/logs/clover.xml"/>
+    </report>
+  </coverage>
   <php>
     <env name="APP_ENV" value="testing"/>
     <env name="APP_KEY" value="base64:d9kZW60V4lFEw2SPn6UiJ0cfi04v80EWP0GZ6kzoxNg="/>

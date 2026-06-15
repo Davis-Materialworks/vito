@@ -14,13 +14,16 @@ use function Illuminate\Support\php_binary;
 function generate_public_key(string $privateKeyPath, string $publicKeyPath): void
 {
     chmod($privateKeyPath, 0400);
+    $privateKeyPath = escapeshellarg($privateKeyPath);
+    $publicKeyPath = escapeshellarg($publicKeyPath);
     exec("ssh-keygen -y -f {$privateKeyPath} > {$publicKeyPath}");
 }
 
 function generate_key_pair(string $path): void
 {
+    $path = escapeshellarg($path);
     exec("ssh-keygen -t ed25519 -m PEM -N '' -f {$path}");
-    chmod($path, 0400);
+    chmod(substr($path, 1, -1), 0400);
 }
 
 /**
@@ -266,10 +269,10 @@ function composer_path(): ?string
         '/usr/local/bin/composer',
         '/usr/bin/composer',
         '/opt/homebrew/bin/composer',
-        trim((string) shell_exec('which composer')),
+        trim((string) @shell_exec('which composer')),
     ];
 
-    return array_find($paths, fn ($path) => is_executable($path));
+    return array_find($paths, fn ($path) => $path !== '' && is_executable($path));
 }
 
 function php_path(): ?string
@@ -289,10 +292,10 @@ function git_path(): ?string
         '/usr/local/bin/git',
         '/usr/bin/git',
         '/opt/homebrew/bin/git',
-        trim((string) shell_exec('which git')),
+        trim((string) @shell_exec('which git')),
     ];
 
-    return array_find($paths, fn ($path) => is_executable($path));
+    return array_find($paths, fn ($path) => $path !== '' && is_executable($path));
 }
 
 function move_directory(string $from, string $to): void
