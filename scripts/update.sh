@@ -8,31 +8,24 @@ echo "Discarding any possible local changes..."
 git reset --hard HEAD
 git clean -fd
 
-echo "Pulling changes..."
-git fetch --all
+# Davis-Materialworks fork: deploy the branch tip (which carries our custom
+# commits) instead of the latest upstream tag. A positional arg overrides the
+# branch; the --alpha/--beta/--rc flags are accepted for compatibility with
+# upgrade-3x-to-4x.sh and ignored, since the branch already tracks the release we run.
+BRANCH="4.x"
+for arg in "$@"; do
+  case "$arg" in
+    --alpha|--beta|--rc|--*) ;;
+    *) BRANCH="$arg" ;;
+  esac
+done
 
-INCLUDE_PATTERN='^4\.[0-9]+\.[0-9]+$' # stable only
+echo "Pulling latest from origin/$BRANCH..."
+git fetch origin --tags --prune
+git checkout "$BRANCH"
+git reset --hard "origin/$BRANCH"
 
-if [[ "$1" == "--alpha" ]]; then
-  INCLUDE_PATTERN='^4\.[0-9]+\.[0-9]+(-alpha-[0-9]+|-beta-[0-9]+|-rc-[0-9]+)?$'
-elif [[ "$1" == "--beta" ]]; then
-  INCLUDE_PATTERN='^4\.[0-9]+\.[0-9]+(-beta-[0-9]+|-rc-[0-9]+)?$'
-fi
-
-# Filter and sort matching tags
-MATCHING_TAGS=$(git tag | grep -E "$INCLUDE_PATTERN" | sort -V)
-
-# Get the latest tag from the list
-NEW_RELEASE=$(echo "$MATCHING_TAGS" | tail -n 1)
-
-if [[ -z "$NEW_RELEASE" ]]; then
-  echo "❌ No matching tag found."
-  exit 1
-fi
-
-echo "Switching to tag: $NEW_RELEASE"
-git checkout "$NEW_RELEASE"
-git pull origin "$NEW_RELEASE"
+NEW_RELEASE="$BRANCH @ $(git rev-parse --short HEAD)"
 
 echo "Installing composer dependencies..."
 composer install --no-dev
