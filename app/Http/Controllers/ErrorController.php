@@ -12,7 +12,7 @@ use App\Models\Server;
 use App\Tables\Servers\ErrorIssueTable;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
-use Illuminate\Http\Response;
+use Inertia\Response as InertiaResponse;
 use Inertia\Inertia;
 use Spatie\RouteAttributes\Attributes\Get;
 use Spatie\RouteAttributes\Attributes\Middleware;
@@ -24,7 +24,7 @@ use Spatie\RouteAttributes\Attributes\Prefix;
 class ErrorController extends Controller
 {
     #[Get('/errors', name: 'errors')]
-    public function index(Server $server, Request $request): Response
+    public function index(Server $server, Request $request): InertiaResponse
     {
         $this->authorize('viewAny', [ErrorIssue::class, $server]);
 
@@ -48,7 +48,7 @@ class ErrorController extends Controller
     }
 
     #[Get('/errors/{errorIssue}', name: 'errors.show')]
-    public function show(Server $server, ErrorIssue $errorIssue, Request $request): Response
+    public function show(Server $server, ErrorIssue $errorIssue, Request $request): InertiaResponse
     {
         $this->authorize('view', [$errorIssue, $server]);
 
