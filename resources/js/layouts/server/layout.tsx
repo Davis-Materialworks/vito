@@ -1,6 +1,7 @@
 import { type NavItem } from '@/types';
 import {
   BoxIcon,
+  BugIcon,
   ChartLineIcon,
   ClockIcon,
   CloudIcon,
@@ -237,9 +238,23 @@ export default function ServerLayout({ children }: { children: ReactNode }) {
     },
     {
       title: 'Monitoring',
-      href: route('monitoring', { server: page.props.server.id }),
       icon: ChartLineIcon,
       isDisabled: isMenuDisabled,
+      children: [
+        {
+          title: 'Metrics',
+          href: route('monitoring', { server: page.props.server.id }),
+          onlyActivePath: route('monitoring', { server: page.props.server.id }),
+          icon: ChartLineIcon,
+          isDisabled: isMenuDisabled,
+        },
+        {
+          title: 'Errors',
+          href: route('errors', { server: page.props.server.id }),
+          icon: BugIcon,
+          isDisabled: isMenuDisabled,
+        },
+      ],
     },
     {
       title: 'Logs',

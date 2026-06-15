@@ -47,9 +47,9 @@ fi
 
 apt remove needrestart -y
 
-useradd -p $(openssl passwd -1 ${V_PASSWORD}) vito
+useradd -p $(mkpasswd -m sha-512 ${V_PASSWORD}) vito 2>/dev/null || useradd -p $(openssl passwd -6 ${V_PASSWORD}) vito
 usermod -aG vito
-echo "vito ALL=(ALL) NOPASSWD:ALL" | tee -a /etc/sudoers
+echo "vito ALL=(ALL) NOPASSWD:/usr/bin/systemctl, /usr/sbin/service, /usr/bin/supervisorctl" | tee -a /etc/sudoers
 mkdir /home/vito
 mkdir /home/vito/.ssh
 chown -R vito:vito /home/vito
@@ -82,7 +82,7 @@ export V_NGINX_CONFIG="
         types_hash_max_size 2048;
         include /etc/nginx/mime.types;
         default_type application/octet-stream;
-        ssl_protocols TLSv1 TLSv1.1 TLSv1.2;
+        ssl_protocols TLSv1.2 TLSv1.3;
         ssl_prefer_server_ciphers on;
         access_log /var/log/nginx/access.log;
         error_log /var/log/nginx/error.log;
@@ -275,6 +275,6 @@ echo "* * * * * cd /home/vito/vito && php artisan schedule:run >> /dev/null 2>&1
 echo "🎉 Congratulations!"
 echo "✅ You can access Vito at: ${VITO_APP_URL}"
 echo "✅ SSH User: vito"
-echo "✅ SSH Password: ${V_PASSWORD}"
 echo "✅ Admin Email: ${V_ADMIN_EMAIL}"
-echo "✅ Admin Password: ${V_ADMIN_PASSWORD}"
+echo "⚠️  Credentials were set during installation. Save them securely — they will not be displayed."
+echo "⚠️  To change the SSH password, run: sudo passwd vito"
