@@ -25,6 +25,7 @@ import {
   MousePointerClickIcon,
   ServerIcon,
   Settings2Icon,
+  TerminalIcon,
   WorkflowIcon,
   ZapIcon,
 } from 'lucide-react';
@@ -66,6 +67,11 @@ export function AppSidebar({ secondNavItems, secondNavTitle }: { secondNavItems?
       title: 'Settings',
       href: route('settings'),
       icon: CogIcon,
+    },
+    {
+      title: 'MCP',
+      href: route('settings.mcp'),
+      icon: TerminalIcon,
     },
     {
       title: 'Admin',
