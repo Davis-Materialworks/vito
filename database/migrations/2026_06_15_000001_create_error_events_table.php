@@ -20,7 +20,7 @@ return new class extends Migration
             $table->longText('stack_trace');
             $table->string('url')->nullable();
             $table->string('request_method')->nullable();
-            $table->foreignId('user_id')->nullable()->constrained()->nullOnDelete();
+            $table->unsignedBigInteger('user_id')->nullable();
             $table->string('user_email')->nullable();
             $table->json('context')->nullable();
             $table->timestamp('occurred_at');

@@ -15,12 +15,17 @@ use Spatie\RouteAttributes\Attributes\Prefix;
 #[Prefix('api/projects/{project}/servers/{server}/sites/{site}')]
 class ErrorIngestionController extends Controller
 {
-    #[Post('errors', name: 'api.errors.ingest')]
+    #[Post('errors', name: 'api.errors.ingest', middleware: 'throttle:error-ingest')]
     public function ingest(Request $request, Server $server, Site $site): JsonResponse
     {
+        if ($site->server_id !== $server->id) {
+            abort(404);
+        }
+
+        $expected = $site->error_ingest_token;
         $token = $request->bearerToken();
 
-        if (! hash_equals((string) config('app.key'), (string) ($token ?? ''))) {
+        if (empty($expected) || empty($token) || ! hash_equals((string) $expected, (string) $token)) {
             return response()->json(['message' => 'Unauthorized'], 401);
         }
 
