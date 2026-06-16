@@ -46,10 +46,6 @@ class ErrorController extends Controller
         return Inertia::render('error-monitoring/index', [
             'server' => new ServerResource($server),
             'issues' => ErrorIssueTable::make($query)->simplePaginate(),
-            'sites' => Site::query()
-                ->where('server_id', $server->id)
-                ->orderBy('domain')
-                ->get(['id', 'domain']),
         ]);
     }
 
