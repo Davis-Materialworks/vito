@@ -37,6 +37,10 @@ composer install --no-dev
 # node is missing or the build fails we keep the committed assets and continue.
 echo "Building frontend assets..."
 if command -v npm >/dev/null 2>&1; then
+  # A prior build run as root can leave root-owned files under node_modules /
+  # public/build that the deploy user can't remove, so npm ci fails with EACCES.
+  # Reclaim ownership for the current user before installing.
+  sudo chown -R "$(id -un):$(id -gn)" node_modules public/build 2>/dev/null || true
   # --include=dev: vite and friends are devDependencies and are required to build.
   npm ci --include=dev --no-audit --no-fund || npm install --include=dev --no-audit --no-fund
   if npm run build; then
