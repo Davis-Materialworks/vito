@@ -127,7 +127,7 @@ export default function ErrorIntegrationDialog({ open, onOpenChange, serverId, s
           <DialogDescription>Select a site to reveal its ingestion endpoint and token, then follow the setup for your platform.</DialogDescription>
         </DialogHeader>
 
-        <div className="flex flex-col gap-4">
+        <div className="flex flex-col gap-4 p-4">
           <Select value={siteId} onValueChange={loadToken}>
             <SelectTrigger>
               <SelectValue placeholder="Select a site" />
