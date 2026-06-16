@@ -15,4 +15,6 @@ interface NotificationInterface
     public function toDiscord(object $notifiable): string;
 
     public function toTelegram(object $notifiable): string;
+
+    public function toNtfy(object $notifiable): string;
 }

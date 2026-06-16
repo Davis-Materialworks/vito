@@ -6,6 +6,7 @@ use App\DTOs\DynamicField;
 use App\DTOs\DynamicForm;
 use App\NotificationChannels\Discord;
 use App\NotificationChannels\Email;
+use App\NotificationChannels\Ntfy;
 use App\NotificationChannels\Slack;
 use App\NotificationChannels\Telegram;
 use App\Plugins\RegisterNotificationChannel;
@@ -21,6 +22,7 @@ class NotificationChannelServiceProvider extends ServiceProvider
         $this->slack();
         $this->email();
         $this->telegram();
+        $this->ntfy();
     }
 
     private function discord(): void
@@ -81,6 +83,29 @@ class NotificationChannelServiceProvider extends ServiceProvider
                     DynamicField::make('chat_id')
                         ->text()
                         ->label('Chat ID'),
+                ]),
+            )
+            ->register();
+    }
+
+    private function ntfy(): void
+    {
+        RegisterNotificationChannel::make(Ntfy::id())
+            ->label('ntfy')
+            ->handler(Ntfy::class)
+            ->form(
+                DynamicForm::make([
+                    DynamicField::make('server_url')
+                        ->text()
+                        ->label('Server URL')
+                        ->default('https://ntfy.sh')
+                        ->placeholder('https://ntfy.sh'),
+                    DynamicField::make('topic')
+                        ->text()
+                        ->label('Topic'),
+                    DynamicField::make('token')
+                        ->password()
+                        ->label('Access Token (optional)'),
                 ]),
             )
             ->register();
