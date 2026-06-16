@@ -4,6 +4,7 @@ namespace App\Http\Controllers\API;
 
 use App\Actions\Error\IngestError;
 use App\Http\Controllers\Controller;
+use App\Models\Project;
 use App\Models\Server;
 use App\Models\Site;
 use Illuminate\Http\JsonResponse;
@@ -16,9 +17,9 @@ use Spatie\RouteAttributes\Attributes\Prefix;
 class ErrorIngestionController extends Controller
 {
     #[Post('errors', name: 'api.errors.ingest', middleware: 'throttle:300,1')]
-    public function ingest(Request $request, Server $server, Site $site): JsonResponse
+    public function ingest(Request $request, Project $project, Server $server, Site $site): JsonResponse
     {
-        if ($site->server_id !== $server->id) {
+        if ($server->project_id !== $project->id || $site->server_id !== $server->id) {
             abort(404);
         }
 
