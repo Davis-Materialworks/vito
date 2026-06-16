@@ -2,6 +2,7 @@ import { type NavItem } from '@/types';
 import {
   BoxIcon,
   BugIcon,
+  ActivityIcon,
   ChartLineIcon,
   ClockIcon,
   CloudIcon,
@@ -162,6 +163,12 @@ export default function ServerLayout({ children }: { children: ReactNode }) {
                 icon: ChartLineIcon,
                 isDisabled: isMenuDisabled,
                 hidden: !page.props.server.services['log_analysis'] || !site.stats_enabled,
+              },
+              {
+                title: 'Metrics',
+                href: route('site-metrics', { server: page.props.server.id, site: site.id }),
+                icon: ActivityIcon,
+                isDisabled: isMenuDisabled,
               },
               {
                 title: 'Settings',

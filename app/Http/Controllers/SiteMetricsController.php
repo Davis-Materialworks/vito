@@ -5,9 +5,10 @@ namespace App\Http\Controllers;
 use App\Actions\Monitoring\GetSiteMetrics;
 use App\Models\Server;
 use App\Models\Site;
-use App\Models\SiteMetric;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Inertia\Inertia;
+use Inertia\Response;
 use Spatie\RouteAttributes\Attributes\Get;
 use Spatie\RouteAttributes\Attributes\Middleware;
 use Spatie\RouteAttributes\Attributes\Prefix;
@@ -16,6 +17,14 @@ use Spatie\RouteAttributes\Attributes\Prefix;
 #[Middleware(['auth', 'has-project'])]
 class SiteMetricsController extends Controller
 {
+    #[Get('/', name: 'site-metrics')]
+    public function index(Server $server, Site $site): Response
+    {
+        $this->authorize('view', [$site, $server]);
+
+        return Inertia::render('sites/metrics');
+    }
+
     #[Get('/json', name: 'site-metrics.json')]
     public function json(Request $request, Server $server, Site $site): JsonResponse
     {
