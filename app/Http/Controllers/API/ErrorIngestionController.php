@@ -15,7 +15,7 @@ use Spatie\RouteAttributes\Attributes\Prefix;
 #[Prefix('api/projects/{project}/servers/{server}/sites/{site}')]
 class ErrorIngestionController extends Controller
 {
-    #[Post('errors', name: 'api.errors.ingest', middleware: 'throttle:error-ingest')]
+    #[Post('errors', name: 'api.errors.ingest', middleware: 'throttle:300,1')]
     public function ingest(Request $request, Server $server, Site $site): JsonResponse
     {
         if ($site->server_id !== $server->id) {
