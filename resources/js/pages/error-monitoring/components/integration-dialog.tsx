@@ -19,14 +19,14 @@ type ErrorIntegrationDialogProps = {
 };
 
 function laravelSnippet({ endpoint, token }: IntegrationDetails): string {
-  return `# .env
+  return `composer require davismw/vito-error-reporter
+
+# .env
 VITO_ERROR_REPORTER_ENDPOINT=${endpoint}
 VITO_ERROR_REPORTER_TOKEN=${token}
 VITO_ERROR_REPORTER_RELEASE=v1.0.0
 
-# Requires the VitoErrorReporter SDK class in your app.
-# In a service provider's boot():
-\\App\\SDK\\VitoErrorReporter::registerGlobalHandler();`;
+# Auto-registered via package discovery — no code needed.`;
 }
 
 function expressSnippet({ endpoint, token }: IntegrationDetails): string {
