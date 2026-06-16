@@ -449,6 +449,28 @@ class OS
     }
 
     /**
+     * @throws SSHError
+     */
+    public function siteMetrics(Site $site): array
+    {
+        $logPath = '/var/log/nginx/'.$site->domain.'-access.log';
+
+        $info = $this->server->ssh()->exec(
+            command: view('ssh.os.site-metrics', ['log_path' => $logPath]),
+            timeout: 5,
+        );
+
+        $values = [];
+        foreach (preg_split('/\R/', $info) ?: [] as $line) {
+            if (preg_match('/^([a-z_]+):(.*)$/', trim($line), $matches) === 1) {
+                $values[$matches[1]] = trim($matches[2]);
+            }
+        }
+
+        return $values;
+    }
+
+    /**
      * Clear a remote log file while preserving permissions and ownership
      *
      * @throws SSHError

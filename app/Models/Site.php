@@ -744,6 +744,22 @@ class Site extends AbstractModel
     }
 
     /**
+     * @return HasMany<SiteMetric, covariant $this>
+     */
+    public function siteMetrics(): HasMany
+    {
+        return $this->hasMany(SiteMetric::class);
+    }
+
+    /**
+     * @return HasOne<SiteMetric, covariant $this>
+     */
+    public function latestSiteMetric(): HasOne
+    {
+        return $this->hasOne(SiteMetric::class)->latestOfMany();
+    }
+
+    /**
      * @return array<string, mixed>
      */
     public function features(): array
