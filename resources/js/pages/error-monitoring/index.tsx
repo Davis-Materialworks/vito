@@ -9,15 +9,20 @@ import { VitoTable } from '@/components/vito-table';
 import type { InertiaTableData, Row } from '@forjedio/inertia-table-react';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { EyeIcon } from 'lucide-react';
+import { EyeIcon, PlugIcon } from 'lucide-react';
+import { useDialog } from '@/hooks/use-dialog';
+
+type SiteOption = { id: number; domain: string };
 
 type Page = {
   server: Server;
   issues: InertiaTableData;
+  sites: SiteOption[];
 };
 
 export default function ErrorMonitoring() {
   const page = usePage<Page>();
+  const dialog = useDialog();
 
   return (
     <ServerLayout>
@@ -25,6 +30,13 @@ export default function ErrorMonitoring() {
       <Container className="max-w-5xl">
         <HeaderContainer>
           <Heading title="Error Monitoring" description="Track application errors grouped by issue" />
+          <Button
+            variant="outline"
+            onClick={() => dialog.errorIntegration.open({ serverId: page.props.server.id, sites: page.props.sites })}
+          >
+            <PlugIcon />
+            Connect app
+          </Button>
         </HeaderContainer>
 
         <VitoTable
