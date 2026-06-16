@@ -43,7 +43,7 @@ class CollectSiteMetricsCommand extends Command
                                     'server_id' => $server->id,
                                     'requests' => $data['requests'] ?? 0,
                                     'avg_response_ms' => $data['avg_response_ms'] ?? null,
-                                    'p95_response_ms' => null,
+                                    'p95_response_ms' => $data['p95_response_ms'] ?? null,
                                     'error_rate' => $data['error_rate'] ?? null,
                                     'bytes' => $data['bytes'] ?? 0,
                                     'status_2xx' => $data['status_2xx'] ?? 0,
