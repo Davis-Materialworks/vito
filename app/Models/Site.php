@@ -64,6 +64,7 @@ use RuntimeException;
  * @property ?string $vhost_template
  * @property bool $vhost_generation_enabled
  * @property ?string $verification_key
+ * @property ?string $error_ingest_token
  * @property Server $server
  * @property Collection<int, ServerLog> $logs
  * @property Collection<int, Deployment> $deployments
@@ -114,7 +115,10 @@ class Site extends AbstractModel
         'vhost_template',
         'vhost_generation_enabled',
         'verification_key',
+        'error_ingest_token',
     ];
+
+    protected $hidden = ['error_ingest_token'];
 
     protected $with = ['isolatedUser'];
 
@@ -132,6 +136,7 @@ class Site extends AbstractModel
         'ssl_enabled' => 'boolean',
         'vhost_generation_enabled' => 'boolean',
         'status' => SiteStatus::class,
+        'error_ingest_token' => 'encrypted',
     ];
 
     public static function boot(): void
@@ -808,5 +813,22 @@ class Site extends AbstractModel
     public function getDeployKeyName(): string
     {
         return $this->domain.'-key-'.$this->id;
+    }
+
+    public function ingestToken(): string
+    {
+        if (! $this->error_ingest_token) {
+            $this->regenerateIngestToken();
+        }
+
+        return (string) $this->error_ingest_token;
+    }
+
+    public function regenerateIngestToken(): string
+    {
+        $this->error_ingest_token = Str::random(48);
+        $this->save();
+
+        return $this->error_ingest_token;
     }
 }

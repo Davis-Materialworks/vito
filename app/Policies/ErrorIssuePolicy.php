@@ -30,4 +30,9 @@ class ErrorIssuePolicy
         return $this->hasWriteAccess($user, $errorIssue->server->project)
             && $errorIssue->server_id === $server->id;
     }
+
+    public function manageIntegration(User $user, Server $server): bool
+    {
+        return $this->hasWriteAccess($user, $server->project) && $server->isReady();
+    }
 }

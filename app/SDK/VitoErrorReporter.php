@@ -8,7 +8,7 @@ class VitoErrorReporter
 {
     private string $endpoint;
 
-    private string $appKey;
+    private string $token;
 
     private ?string $environment;
 
@@ -18,12 +18,12 @@ class VitoErrorReporter
 
     public function __construct(
         string $endpoint,
-        string $appKey,
+        string $token,
         ?string $environment = null,
         ?string $release = null,
     ) {
         $this->endpoint = $endpoint;
-        $this->appKey = $appKey;
+        $this->token = $token;
         $this->environment = $environment ?? app()->environment();
         $this->release = $release;
         $this->context = [];
@@ -33,7 +33,7 @@ class VitoErrorReporter
     {
         return new self(
             config('vito-error-reporter.endpoint'),
-            config('vito-error-reporter.app_key'),
+            config('vito-error-reporter.token'),
             config('vito-error-reporter.environment'),
             config('vito-error-reporter.release'),
         );
@@ -49,7 +49,7 @@ class VitoErrorReporter
     public function report(\Throwable $exception, ?string $url = null, ?string $method = null): bool
     {
         try {
-            $response = Http::withToken($this->appKey)
+            $response = Http::withToken($this->token)
                 ->timeout(5)
                 ->post($this->endpoint, [
                     'exception_class' => get_class($exception),

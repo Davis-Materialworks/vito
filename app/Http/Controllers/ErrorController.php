@@ -9,7 +9,9 @@ use App\Http\Resources\ErrorIssueResource;
 use App\Http\Resources\ServerResource;
 use App\Models\ErrorIssue;
 use App\Models\Server;
+use App\Models\Site;
 use App\Tables\Servers\ErrorIssueTable;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
@@ -82,5 +84,42 @@ class ErrorController extends Controller
         app(IgnoreIssue::class)->ignore($errorIssue);
 
         return back()->with('success', 'Issue ignored');
+    }
+
+    #[Get('/errors-integration/{site}', name: 'errors.integration')]
+    public function integration(Server $server, Site $site): JsonResponse
+    {
+        $this->authorize('manageIntegration', [ErrorIssue::class, $server]);
+
+        abort_unless($site->server_id === $server->id, 404);
+
+        return response()->json($this->integrationPayload($server, $site));
+    }
+
+    #[Post('/errors-integration/{site}/regenerate', name: 'errors.integration.regenerate')]
+    public function regenerateIntegration(Server $server, Site $site): JsonResponse
+    {
+        $this->authorize('manageIntegration', [ErrorIssue::class, $server]);
+
+        abort_unless($site->server_id === $server->id, 404);
+
+        $site->regenerateIngestToken();
+
+        return response()->json($this->integrationPayload($server, $site));
+    }
+
+    /**
+     * @return array{endpoint: string, token: string}
+     */
+    private function integrationPayload(Server $server, Site $site): array
+    {
+        return [
+            'endpoint' => route('api.errors.ingest', [
+                'project' => $server->project_id,
+                'server' => $server->id,
+                'site' => $site->id,
+            ]),
+            'token' => $site->ingestToken(),
+        ];
     }
 }
