@@ -1,5 +1,5 @@
 import { useId } from 'react';
-import { Area, AreaChart, XAxis, YAxis } from 'recharts';
+import { Area, AreaChart, ReferenceLine, XAxis, YAxis } from 'recharts';
 
 import { Card, CardContent } from '@/components/ui/card';
 import { ChartConfig, ChartContainer, ChartTooltip, ChartTooltipContent } from '@/components/ui/chart';
@@ -15,9 +15,10 @@ interface Props {
   formatLabel?: (value: string) => string;
   valueFormatter?: (value: unknown) => string | number;
   height?: 'small' | 'medium';
+  markers?: Array<{ date: string; commit: string }>;
 }
 
-export function StatsChart({ title, value, color, dataKey, labelKey, data, formatLabel, valueFormatter, height = 'medium' }: Props) {
+export function StatsChart({ title, value, color, dataKey, labelKey, data, formatLabel, valueFormatter, height = 'medium', markers }: Props) {
   const gradientId = useId();
   const chartConfig = {
     [dataKey]: { label: title, color },
@@ -67,6 +68,15 @@ export function StatsChart({ title, value, color, dataKey, labelKey, data, forma
                 }
               />
               <Area dataKey={dataKey} type="monotone" fill={`url(#${gradientId})`} stroke={color} />
+              {markers?.map((marker, index) => (
+                <ReferenceLine
+                  key={`${marker.date}-${index}`}
+                  x={marker.date}
+                  stroke="var(--color-muted-foreground)"
+                  strokeDasharray="4 4"
+                  label={{ value: marker.commit, position: 'insideTopRight', fontSize: 9, fill: 'var(--color-muted-foreground)' }}
+                />
+              ))}
             </AreaChart>
           </ChartContainer>
         )}

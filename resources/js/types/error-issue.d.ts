@@ -16,6 +16,8 @@ export interface ErrorIssue {
   events_count: number;
   site?: { id: number; domain: string };
   latest_event?: ErrorEvent;
+  first_release?: string | null;
+  last_release?: string | null;
   created_at: string;
 }
 

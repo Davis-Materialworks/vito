@@ -76,7 +76,7 @@ class IngestError
                 'server_id' => $server->id,
                 'site_id' => $site->id,
                 'environment' => $input['environment'] ?? null,
-                'release' => $input['release'] ?? null,
+                'release' => $this->resolveRelease($site, $input),
                 'exception_class' => $input['exception_class'],
                 'message' => $input['message'],
                 'stack_trace' => $input['stack_trace'],
@@ -97,6 +97,24 @@ class IngestError
 
             return $event;
         });
+    }
+
+    /**
+     * Attribute the error to the release that is currently live for the site
+     * (Vito triggered the deploy, so this is authoritative). Falls back to the
+     * release reported by the SDK if the site has no active deployment.
+     *
+     * @param  array<string, mixed>  $input
+     */
+    private function resolveRelease(Site $site, array $input): ?string
+    {
+        $commit = $site->deployments()->where('active', true)->latest('id')->value('commit_id');
+
+        if ($commit !== null) {
+            return substr((string) $commit, 0, 8);
+        }
+
+        return $input['release'] ?? null;
     }
 
     private function normalizeMessage(string $message): string

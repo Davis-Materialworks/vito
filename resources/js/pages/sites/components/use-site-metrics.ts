@@ -16,9 +16,12 @@ export type SiteMetricPoint = {
   status_5xx: number;
 };
 
+export type SiteDeployMarker = { date: string; commit: string };
+
 export type SiteMetricsResponse = {
   current: SiteMetricPoint | null;
   history: SiteMetricPoint[];
+  deploys: SiteDeployMarker[];
 };
 
 const REFETCH_INTERVALS: Record<string, number> = {

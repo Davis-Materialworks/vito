@@ -13,6 +13,7 @@ class SiteMetric extends Model
         'requests',
         'avg_response_ms',
         'p95_response_ms',
+        'release',
         'error_rate',
         'bytes',
         'status_2xx',
