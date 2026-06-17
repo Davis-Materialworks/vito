@@ -68,6 +68,12 @@ export default function ShowError() {
                   {issue.site.domain}
                 </span>
               )}
+              {issue.first_release && (
+                <span className="text-muted-foreground flex items-center gap-1 text-sm">
+                  <GitCommitIcon className="h-3 w-3" />
+                  First seen in {issue.first_release.substring(0, 7)}
+                </span>
+              )}
             </div>
           </div>
           <div className="flex items-center gap-2">

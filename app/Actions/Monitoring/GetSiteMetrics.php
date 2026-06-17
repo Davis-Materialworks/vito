@@ -2,6 +2,7 @@
 
 namespace App\Actions\Monitoring;
 
+use App\Enums\DeploymentStatus;
 use App\Models\Site;
 use App\Models\SiteMetric;
 use Carbon\Carbon;
@@ -32,15 +33,68 @@ class GetSiteMetrics
             $input['to'] = Carbon::parse($input['to'])->format('Y-m-d').' 23:59:59';
         }
 
+        $from = $this->getFromDate($input);
+        $to = $this->getToDate($input);
+        $history = $this->metrics(
+            site: $site,
+            fromDate: $from,
+            toDate: $to,
+            interval: $this->getInterval($input)
+        );
+
         return [
             'current' => $this->current($site),
-            'history' => $this->metrics(
-                site: $site,
-                fromDate: $this->getFromDate($input),
-                toDate: $this->getToDate($input),
-                interval: $this->getInterval($input)
-            ),
+            'history' => $history,
+            'deploys' => $this->deployMarkers($site, $from, $to, $history),
         ];
+    }
+
+    /**
+     * Finished deployments within the window, each snapped to the nearest
+     * metrics bucket so the chart can draw a reference line that lines up with
+     * the categorical x-axis.
+     *
+     * @param  Collection<int, stdClass>  $history
+     * @return array<int, array{date: string, commit: string}>
+     */
+    private function deployMarkers(Site $site, Carbon $from, Carbon $to, Collection $history): array
+    {
+        if ($history->isEmpty()) {
+            return [];
+        }
+
+        $deploys = $site->deployments()
+            ->where('status', DeploymentStatus::FINISHED)
+            ->whereBetween('created_at', [$from->format('Y-m-d H:i:s'), $to->format('Y-m-d H:i:s')])
+            ->orderBy('created_at')
+            ->get(['commit_id', 'created_at']);
+
+        if ($deploys->isEmpty()) {
+            return [];
+        }
+
+        $buckets = [];
+        foreach ($history as $row) {
+            $buckets[$row->date] = Carbon::createFromFormat('Y-m-d H:i', $row->date)->getTimestamp();
+        }
+
+        return $deploys->map(function (object $deploy) use ($buckets): array {
+            $target = $deploy->created_at->getTimestamp();
+            $nearest = null;
+            $bestDiff = null;
+            foreach ($buckets as $date => $timestamp) {
+                $diff = abs($timestamp - $target);
+                if ($bestDiff === null || $diff < $bestDiff) {
+                    $bestDiff = $diff;
+                    $nearest = $date;
+                }
+            }
+
+            return [
+                'date' => (string) $nearest,
+                'commit' => substr((string) $deploy->commit_id, 0, 8),
+            ];
+        })->all();
     }
 
     /**

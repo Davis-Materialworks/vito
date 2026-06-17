@@ -32,6 +32,8 @@ class ErrorIssueResource extends JsonResource
                 'domain' => $this->site->domain,
             ]),
             'latest_event' => $this->whenLoaded('latestEvent', fn () => new ErrorEventResource($this->latestEvent)),
+            'first_release' => $this->whenLoaded('firstEvent', fn () => $this->firstEvent?->release),
+            'last_release' => $this->whenLoaded('latestEvent', fn () => $this->latestEvent?->release),
             'created_at' => $this->created_at,
         ];
     }

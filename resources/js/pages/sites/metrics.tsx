@@ -61,6 +61,7 @@ function MetricsView({ server, site }: { server: Server; site: Site }) {
   const history = data?.history ?? [];
   const current = data?.current ?? null;
   const chartData = history as unknown as Array<Record<string, string | number>>;
+  const deploys = data?.deploys ?? [];
 
   return (
     <>
@@ -107,12 +108,12 @@ function MetricsView({ server, site }: { server: Server; site: Site }) {
 
       {history.length > 0 && (
         <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
-          <StatsChart title="Requests" color="var(--color-chart-1)" dataKey="requests" labelKey="date" data={chartData} formatLabel={formatTime} valueFormatter={formatNumber} />
-          <StatsChart title="Avg response (ms)" color="var(--color-chart-2)" dataKey="avg_response_ms" labelKey="date" data={chartData} formatLabel={formatTime} valueFormatter={formatMs} />
-          <StatsChart title="p95 response (ms)" color="var(--color-chart-3)" dataKey="p95_response_ms" labelKey="date" data={chartData} formatLabel={formatTime} valueFormatter={formatMs} />
-          <StatsChart title="Error rate (%)" color="var(--color-chart-4)" dataKey="error_rate" labelKey="date" data={chartData} formatLabel={formatTime} valueFormatter={formatPercent} />
-          <StatsChart title="4xx responses" color="var(--color-chart-4)" dataKey="status_4xx" labelKey="date" data={chartData} formatLabel={formatTime} valueFormatter={formatNumber} />
-          <StatsChart title="5xx responses" color="var(--color-chart-5)" dataKey="status_5xx" labelKey="date" data={chartData} formatLabel={formatTime} valueFormatter={formatNumber} />
+          <StatsChart title="Requests" color="var(--color-chart-1)" dataKey="requests" labelKey="date" data={chartData} formatLabel={formatTime} valueFormatter={formatNumber} markers={deploys} />
+          <StatsChart title="Avg response (ms)" color="var(--color-chart-2)" dataKey="avg_response_ms" labelKey="date" data={chartData} formatLabel={formatTime} valueFormatter={formatMs} markers={deploys} />
+          <StatsChart title="p95 response (ms)" color="var(--color-chart-3)" dataKey="p95_response_ms" labelKey="date" data={chartData} formatLabel={formatTime} valueFormatter={formatMs} markers={deploys} />
+          <StatsChart title="Error rate (%)" color="var(--color-chart-4)" dataKey="error_rate" labelKey="date" data={chartData} formatLabel={formatTime} valueFormatter={formatPercent} markers={deploys} />
+          <StatsChart title="4xx responses" color="var(--color-chart-4)" dataKey="status_4xx" labelKey="date" data={chartData} formatLabel={formatTime} valueFormatter={formatNumber} markers={deploys} />
+          <StatsChart title="5xx responses" color="var(--color-chart-5)" dataKey="status_5xx" labelKey="date" data={chartData} formatLabel={formatTime} valueFormatter={formatNumber} markers={deploys} />
         </div>
       )}
     </>

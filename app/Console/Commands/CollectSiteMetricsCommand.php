@@ -5,6 +5,7 @@ namespace App\Console\Commands;
 use App\Enums\ServerStatus;
 use App\Enums\SiteStatus;
 use App\Models\Server;
+use App\Models\Site;
 use App\Models\SiteMetric;
 use Illuminate\Console\Command;
 use Illuminate\Database\Eloquent\Builder;
@@ -44,6 +45,7 @@ class CollectSiteMetricsCommand extends Command
                                     'requests' => $data['requests'] ?? 0,
                                     'avg_response_ms' => $data['avg_response_ms'] ?? null,
                                     'p95_response_ms' => $data['p95_response_ms'] ?? null,
+                                    'release' => $this->activeRelease($site),
                                     'error_rate' => $data['error_rate'] ?? null,
                                     'bytes' => $data['bytes'] ?? 0,
                                     'status_2xx' => $data['status_2xx'] ?? 0,
@@ -66,5 +68,12 @@ class CollectSiteMetricsCommand extends Command
             });
 
         $this->info("Checked $checkedMetrics site metrics");
+    }
+
+    private function activeRelease(Site $site): ?string
+    {
+        $commit = $site->deployments()->where('active', true)->latest('id')->value('commit_id');
+
+        return $commit !== null ? substr((string) $commit, 0, 8) : null;
     }
 }
